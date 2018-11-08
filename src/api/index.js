@@ -10,7 +10,8 @@ import {
 
 
 // 文件上传接口
-export const uploadFile = "/xboot/upload/file"
+export const uploadFile = "/rs/common/upload"
+
 // 验证码渲染图片接口
 export const drawCodeImage = "/xboot/common/captcha/draw/"
 // 获取菜单

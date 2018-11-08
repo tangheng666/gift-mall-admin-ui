@@ -168,10 +168,10 @@ u {
     <Modal title="用户加款" v-model="addMoneyModel" :mask-closable='false' :width="500" :styles="{top: '30px'}" class-name="vertical-center-modal">
       <Form ref="userAddMoneyFrom" :model="userAddMoneyFrom" :label-width="70" :rules="addMoneyFormValidate">
         <FormItem label="用户名" prop="username">
-          <u>{{userAddMoneyFrom.username }}</u>
+          <u>{{userAddMoneyFrom.mobile }}</u>
         </FormItem>
-        <FormItem label="加款金额" prop="money">
-          <InputNumber v-model="userAddMoneyFrom.money"></InputNumber>（元）
+        <FormItem label="加款金额" prop="amount">
+          <InputNumber v-model="userAddMoneyFrom.amount"></InputNumber>（元）
         </FormItem>
 
       </Form>
@@ -191,12 +191,14 @@ import {
   enableUser,
   disableUser,
   deleteUser,
-  getAllUserData
+  getAllUserData,
+  charge
 } from '@/api/user'
 import { getAllRoleList } from '@/api/role'
 import { uploadFile } from '@/api/index'
 import expandRow from './expand.vue'
 import circleLoading from '../../my-components/circle-loading.vue'
+import numeral from 'numeral'
 export default {
   name: 'user-manage',
   components: {
@@ -235,7 +237,7 @@ export default {
       selectDep: [],
       searchKey: '',
       searchForm: {
-        offset: 0,
+        offset: 1,
         limit: 10,
         sort: '',
         order: 'desc',
@@ -252,9 +254,9 @@ export default {
         roles: []
       },
       userAddMoneyFrom: {
-        userId: '',
-        username: '',
-        money: 0
+        usrid: '',
+        mobile: '',
+        amount: 0
       },
       userRoles: [],
       roleList: [],
@@ -273,7 +275,7 @@ export default {
         ]
       },
       addMoneyFormValidate: {
-        money: [{ required: true, message: '请输入加款金额' }]
+        amount: [{ required: true, message: '请输入加款金额' }]
       },
       submitLoading: false,
       columns: [
@@ -322,18 +324,12 @@ export default {
           align: 'center'
         },
         {
-          title: '用户类型',
-          key: 'type',
+          title: '可用余额',
+          key: 'wealth',
           align: 'center',
           width: 100,
           render: (h, params) => {
-            let re = ''
-            if (params.row.type === 1) {
-              re = '管理员'
-            } else if (params.row.type === 0) {
-              re = '普通用户'
-            }
-            return h('div', re)
+            return h('span', numeral(params.row.wealth).format('0.00'))
           }
         },
         {
@@ -350,179 +346,80 @@ export default {
           align: 'center',
           fixed: 'right',
           render: (h, params) => {
-            if (params.row.status === 0) {
-              return h('div', [
-                h(
-                  'Button',
-                  {
-                    props: {
-                      type: 'info',
-                      size: 'small'
-                    },
-                    style: {
-                      marginRight: '5px'
-                    },
-                    on: {
-                      click: () => {
-                        this.addMoney(params.row)
-                      }
-                    }
+            return h('div', [
+              h(
+                'Button',
+                {
+                  props: {
+                    type: 'info',
+                    size: 'small'
                   },
-                  '加款'
-                ),
-                h(
-                  'Button',
-                  {
-                    props: {
-                      type: 'primary',
-                      size: 'small'
-                    },
-                    style: {
-                      marginRight: '5px'
-                    },
-                    on: {
-                      click: () => {
-                        this.edit(params.row)
-                      }
-                    }
+                  style: {
+                    marginRight: '5px'
                   },
-                  '编辑'
-                ),
-                h(
-                  'Button',
-                  {
-                    props: {
-                      size: 'small'
-                    },
-                    style: {
-                      marginRight: '5px'
-                    },
-                    on: {
-                      click: () => {
-                        this.disable(params.row)
-                      }
+                  on: {
+                    click: () => {
+                      this.addMoney(params.row)
                     }
+                  }
+                },
+                '加款'
+              ),
+              h(
+                'Button',
+                {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
                   },
-                  '禁用'
-                ),
-                h(
-                  'Button',
-                  {
-                    props: {
-                      type: 'error',
-                      size: 'small'
-                    },
-                    on: {
-                      click: () => {
-                        this.remove(params.row)
-                      }
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    click: () => {
+                      this.edit(params.row)
                     }
+                  }
+                },
+                '编辑'
+              ),
+              h(
+                'Button',
+                {
+                  props: {
+                    size: 'small'
                   },
-                  '删除'
-                )
-              ])
-            } else {
-              return h('div', [
-                h(
-                  'Button',
-                  {
-                    props: {
-                      type: 'primary',
-                      size: 'small'
-                    },
-                    style: {
-                      marginRight: '5px'
-                    },
-                    on: {
-                      click: () => {
-                        this.edit(params.row)
-                      }
+                  style: {
+                    marginRight: '5px'
+                  },
+                  on: {
+                    click: () => {
+                      this.disable(params.row)
                     }
+                  }
+                },
+                '禁用'
+              ),
+              h(
+                'Button',
+                {
+                  props: {
+                    type: 'error',
+                    size: 'small'
                   },
-                  '编辑'
-                ),
-                h(
-                  'Button',
-                  {
-                    props: {
-                      type: 'success',
-                      size: 'small'
-                    },
-                    style: {
-                      marginRight: '5px'
-                    },
-                    on: {
-                      click: () => {
-                        this.enable(params.row)
-                      }
+                  on: {
+                    click: () => {
+                      this.remove(params.row)
                     }
-                  },
-                  '启用'
-                ),
-                h(
-                  'Button',
-                  {
-                    props: {
-                      type: 'error',
-                      size: 'small'
-                    },
-                    on: {
-                      click: () => {
-                        this.remove(params.row)
-                      }
-                    }
-                  },
-                  '删除'
-                )
-              ])
-            }
+                  }
+                },
+                '删除'
+              )
+            ])
           }
         }
       ],
-      // exportColumns: [
-      //   {
-      //     title: '用户名',
-      //     key: 'username'
-      //   },
-      //   {
-      //     title: '头像',
-      //     key: 'avatar'
-      //   },
-      //   {
-      //     title: '手机',
-      //     key: 'mobile'
-      //   },
-      //   {
-      //     title: '邮箱',
-      //     key: 'email'
-      //   },
-      //   {
-      //     title: '性别',
-      //     key: 'sex'
-      //   },
-      //   {
-      //     title: '用户类型',
-      //     key: 'type'
-      //   },
-      //   {
-      //     title: '状态',
-      //     key: 'status'
-      //   },
-      //   {
-      //     title: '删除标志',
-      //     key: 'delFlag'
-      //   },
-      //   {
-      //     title: '创建时间',
-      //     key: 'createTime'
-      //   },
-      //   {
-      //     title: '更新时间',
-      //     key: 'updateTime'
-      //   }
-      // ],
       data: [],
-      //  exportData: [],
       total: 0,
       addMoneyModel: false
     }
@@ -565,13 +462,13 @@ export default {
       })
     },
     handleSearch() {
-      this.searchForm.offset = 0
+      this.searchForm.offset = 1
       this.searchForm.limit = 10
       this.getUserList()
     },
     handleReset() {
       this.$refs.searchForm.resetFields()
-      this.searchForm.offset = 0
+      this.searchForm.offset = 1
       this.searchForm.limit = 10
       this.selectDep = []
       // 重新加载数据
@@ -627,7 +524,21 @@ export default {
     //     }
     //   })
     // },
-    submitAddMoney() {},
+    submitAddMoney() {
+      this.$refs.userAddMoneyFrom.validate(valid => {
+        if (valid) {
+          charge(this.userAddMoneyFrom).then(res => {
+            if (res.returnCode === '0000') {
+              this.$Message.success('操作成功')
+              this.getUserList()
+              this.addMoneyModel = false
+            } else {
+              this.$Message.info(res.returnMessage)
+            }
+          })
+        }
+      })
+    },
     cancelAddMoney() {
       this.addMoneyModel = false
     },
@@ -722,7 +633,8 @@ export default {
       this.$refs.userAddMoneyFrom.resetFields()
       let str = JSON.stringify(v)
       let userInfo = JSON.parse(str)
-      this.userAddMoneyFrom = userInfo
+      this.userAddMoneyFrom.usrid = userInfo.id
+      this.userAddMoneyFrom.mobile = userInfo.mobile
       this.addMoneyModel = true
     },
     edit(v) {

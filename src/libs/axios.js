@@ -14,7 +14,7 @@ import qs from 'qs'
 
 
 // 统一请求路径前缀
-let base = '/admin';
+let base = '/rs';
 // 超时设定
 axios.defaults.timeout = 15000;
 
@@ -81,9 +81,16 @@ export const getRequest = (url, params) => {
 
 export const postRequest = (url, params) => {
     let accessToken = getStore("accessToken");
+    if (params.offset && !isNaN(params.offset)) {
+        params.offset = params.offset - 1;
+    }
+    let basea = base;
+    if (!url.indexOf("upload") != -1) {
+        basea = base + "/admin"
+    } 
     return axios({
         method: 'post',
-        url: `${base}${url}`,
+        url: `${basea}${url}`,
         data: qs.stringify(params),
         transformRequest: [function (data) {
             if (accessToken && accessToken.trim() !== '') {

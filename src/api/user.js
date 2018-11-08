@@ -30,3 +30,8 @@ export const disableUser = (id, params) => {
 export const deleteUser = (ids, params) => {
   return deleteRequest(`/user/delByIds/${ids}`, params)
 }
+
+// 用户加款
+export const charge = (params) => {
+  return postRequest('/charge', params)
+}

@@ -3,8 +3,8 @@ module.exports = {
         host: '192.168.1.190',
         port: 9999,
         proxy: {
-            '/admin': {
-                target: 'http://182.61.16.69:8080/mall/rs', // 请求本地 需要xboot后台项目
+            '/rs': {
+                target: 'http://182.61.16.69:8080/mall/', // 请求本地 需要后台项目
                 ws: true
             },
             '/foo': {

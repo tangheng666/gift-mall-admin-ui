@@ -23,50 +23,50 @@ u {
 <template>
   <div class="search">
     <Row>
-      <Col>
-      <Card>
-        <Row>
-          <Form ref="searchForm" :model="searchForm" inline :label-width="70" class="search-form">
-            <Form-item label="公告标题" prop="title">
-              <Input type="text" v-model="searchForm.title" clearable placeholder="请输入标题" style="width: 200px" />
-            </Form-item>
-            <Form-item label="创建时间">
-              <DatePicker v-model="selectDate" type="date" format="yyyy-MM-dd" clearable @on-change="selectDateRange" placeholder="选择创建时间" style="width: 200px"></DatePicker>
-            </Form-item>
-            <Form-item style="margin-left:-35px;" class="br">
-              <Button @click="handleSearch" type="primary" icon="ios-search">搜索</Button>
-              <Button @click="handleReset">重置</Button>
-            </Form-item>
-          </Form>
-        </Row>
-        <Row class="operation">
-          <Button @click="add" type="primary" icon="md-add">添加公告</Button>
-          <Button @click="delAll" icon="md-trash">批量删除</Button>
-          <Dropdown @on-click="handleDropdown">
-            <Button>
-              更多操作
-              <Icon type="md-arrow-dropdown" />
-            </Button>
-            <DropdownMenu slot="list">
-              <DropdownItem name="refresh">刷新</DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-          <circleLoading v-if="operationLoading" />
-        </Row>
-        <Row>
-          <Alert show-icon>
-            已选择 <span class="select-count">{{selectCount}}</span> 项
-            <a class="select-clear" @click="clearSelectAll">清空</a>
-          </Alert>
-        </Row>
-        <Row>
-          <Table :loading="loading" border :columns="columns" :data="data" sortable="custom" @on-sort-change="changeSort" @on-selection-change="showSelect" ref="table"></Table>
-        </Row>
-        <Row type="flex" justify="end" class="page">
-          <Page :current="searchForm.offset" :total="total" :page-size="searchForm.limit" @on-change="changePage" @on-page-size-change="changelimit" :page-size-opts="[10,20,50]" size="small" show-total show-elevator show-sizer></Page>
-        </Row>
-      </Card>
-      </Col>
+      <i-col>
+        <Card>
+          <Row>
+            <Form ref="searchForm" :model="searchForm" inline :label-width="70" class="search-form">
+              <Form-item label="公告标题" prop="title">
+                <Input type="text" v-model="searchForm.title" clearable placeholder="请输入标题" style="width: 200px" />
+              </Form-item>
+              <Form-item label="创建时间">
+                <DatePicker v-model="selectDate" type="date" format="yyyy-MM-dd" clearable @on-change="selectDateRange" placeholder="选择创建时间" style="width: 200px"></DatePicker>
+              </Form-item>
+              <Form-item style="margin-left:-35px;" class="br">
+                <Button @click="handleSearch" type="primary" icon="ios-search">搜索</Button>
+                <Button @click="handleReset">重置</Button>
+              </Form-item>
+            </Form>
+          </Row>
+          <Row class="operation">
+            <Button @click="add" type="primary" icon="md-add">添加公告</Button>
+            <Button @click="delAll" icon="md-trash">批量删除</Button>
+            <Dropdown @on-click="handleDropdown">
+              <Button>
+                更多操作
+                <Icon type="md-arrow-dropdown" />
+              </Button>
+              <DropdownMenu slot="list">
+                <DropdownItem name="refresh">刷新</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+            <circleLoading v-if="operationLoading" />
+          </Row>
+          <Row>
+            <Alert show-icon>
+              已选择 <span class="select-count">{{selectCount}}</span> 项
+              <a class="select-clear" @click="clearSelectAll">清空</a>
+            </Alert>
+          </Row>
+          <Row>
+            <Table :loading="loading" border :columns="columns" :data="data" sortable="custom" @on-sort-change="changeSort" @on-selection-change="showSelect" ref="table"></Table>
+          </Row>
+          <Row type="flex" justify="end" class="page">
+            <Page :current="searchForm.offset" :total="total" :page-size="searchForm.limit" @on-change="changePage" @on-page-size-change="changelimit" :page-size-opts="[10,20,50]" size="small" show-elevator show-sizer></Page>
+          </Row>
+        </Card>
+      </i-col>
     </Row>
     <Modal :title="modalTitle" v-model="noticeModalVisible" :mask-closable='false' :width="1000" @on-cancel="cancelNotice" :styles="{top: '30px'}">
       <Form ref="noticeForm" :model="noticeForm" :label-width="70" :rules="noticeFormValidate">
@@ -83,6 +83,21 @@ u {
       <div slot="footer">
         <Button type="text" @click="cancelNotice">取消</Button>
         <Button type="primary" :loading="submitLoading" @click="submitNotice">提交</Button>
+      </div>
+    </Modal>
+
+    <Modal v-model="noticeModalPreview" :width="800" :closable="false" :mask-closable='false' :styles="{top: '30px'}">
+      <div style="text-align:center;margin:20px;">
+        <p class="previewTitle">
+          <span>{{noticeForm.title}}</span>
+        </p>
+        <p class="previewDate"> {{noticeForm.dateCreated}}</p>
+        <p class="previewRemark"> <span>摘要&nbsp;&nbsp;</span>{{noticeForm.remark}}</p>
+
+        <p v-html="noticeForm.content"></p>
+      </div>
+      <div slot="footer" style="text-align: center;">
+        <Button type="primary" @click="closePreview">已阅</Button>
       </div>
     </Modal>
   </div>
@@ -121,7 +136,8 @@ export default {
         title: '',
         content: '',
         remark: '',
-        id: ''
+        id: '',
+        dateCreated: ''
       },
       tinymceId:
         'vue-tinymce-' + +new Date() + ((Math.random() * 1000).toFixed(0) + ''),
@@ -180,7 +196,7 @@ export default {
                   },
                   on: {
                     click: () => {
-                      this.look(params.row)
+                      this.preview(params.row)
                     }
                   }
                 },
@@ -204,28 +220,14 @@ export default {
                 },
                 '编辑'
               )
-              // h(
-              //   'Button',
-              //   {
-              //     props: {
-              //       type: 'error',
-              //       size: 'small'
-              //     },
-              //     on: {
-              //       click: () => {
-              //         this.remove(params.row)
-              //       }
-              //     }
-              //   },
-              //   '删除'
-              // )
             ])
           }
         }
       ],
       data: [],
       exportData: [],
-      total: 0
+      total: 0,
+      noticeModalPreview: false
     }
   },
   methods: {
@@ -248,16 +250,17 @@ export default {
     },
     getNoticeList() {
       this.loading = true
-      getNoticeList({
-        offset: this.searchForm.offset - 1,
-        limit: this.searchForm.limit
-      }).then(res => {
+      getNoticeList(this.searchForm).then(res => {
         this.loading = false
         if (res.returnCode === '0000') {
           this.data = res.data
           if (!res.next) {
             this.total = res.data.length
+            
+          console.log(this.total);
           } else {
+            
+          console.log(this.total + "   2");
             this.total = res.data.length + 1
           }
         }
@@ -346,6 +349,16 @@ export default {
       window.tinymce.get(this.tinymceId).setContent(notice.content)
       this.noticeForm = notice
       this.noticeModalVisible = true
+    },
+
+    preview(v) {
+      let str = JSON.stringify(v)
+      let notice = JSON.parse(str)
+      this.noticeForm = notice
+      this.noticeModalPreview = true
+    },
+    closePreview() {
+      this.noticeModalPreview = false
     },
     remove(v) {
       this.$Modal.confirm({
