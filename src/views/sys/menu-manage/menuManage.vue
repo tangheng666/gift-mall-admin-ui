@@ -191,7 +191,7 @@ import {
   editPermission,
   deletePermission,
   searchPermission
-} from "@/api/index";
+} from "@/api/permission";
 import util from "@/libs/util.js";
 export default {
   name: "menu-manage",

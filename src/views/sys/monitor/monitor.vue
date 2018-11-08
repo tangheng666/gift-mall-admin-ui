@@ -43,10 +43,10 @@ export default {
   methods: {
     initUrl() {
       let url = this.$route.meta.url;
+      console.log(url);
       if (url !== null && url !== undefined) {
         this.url = url;
         this.go = url;
-        // window.open(this.go);
       }
     },
     handleGo() {

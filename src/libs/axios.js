@@ -1,10 +1,20 @@
-import axios from 'axios';
-import { getStore, setStore } from './storage';
-import { router } from '../router/index';
-import { Message } from 'iview';
-import Cookies from 'js-cookie';
+import axios from 'axios'
+import {
+    getStore,
+    setStore
+} from './storage'
+import {
+    router
+} from '../router/index'
+import {
+    Message
+} from 'iview';
+import Cookies from 'js-cookie'
+import qs from 'qs'
+
+
 // 统一请求路径前缀
-let base = '/xboot';
+let base = '/admin';
 // 超时设定
 axios.defaults.timeout = 15000;
 
@@ -60,9 +70,12 @@ export const getRequest = (url, params) => {
         method: 'get',
         url: `${base}${url}`,
         params: params,
-        headers: {
-            'accessToken': accessToken
-        }
+        transformRequest: [function (data) {
+            if (accessToken && accessToken.trim() !== '') {
+                data += "&token=" + accessToken
+            }
+            return data;
+        }],
     });
 };
 
@@ -71,17 +84,16 @@ export const postRequest = (url, params) => {
     return axios({
         method: 'post',
         url: `${base}${url}`,
-        data: params,
+        data: qs.stringify(params),
         transformRequest: [function (data) {
-            let ret = '';
-            for (let it in data) {
-                ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&';
+            if (accessToken && accessToken.trim() !== '') {
+                data += "&token=" + accessToken
             }
-            return ret;
+            return data;
         }],
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-            'accessToken': accessToken
+            //  'accessToken': accessToken
         }
     });
 };

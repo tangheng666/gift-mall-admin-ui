@@ -45,7 +45,6 @@
                 </a>
                 <DropdownMenu slot="list">
                   <DropdownItem name="ownSpace">{{ $t('userCenter') }}</DropdownItem>
-                  <DropdownItem name="ownSpaceOld">{{ $t('userCenterOld') }}</DropdownItem>
                   <DropdownItem name="changePass">{{ $t('changePass') }}</DropdownItem>
                   <DropdownItem name="loginout" divided>{{ $t('logout') }}</DropdownItem>
                 </DropdownMenu>
@@ -151,11 +150,6 @@ export default {
         util.openNewPage(this, "ownspace_index");
         this.$router.push({
           name: "ownspace_index"
-        });
-      } else if (name === "ownSpaceOld") {
-        util.openNewPage(this, "ownspace_old");
-        this.$router.push({
-          name: "ownspace_old"
         });
       } else if (name === "changePass") {
         util.openNewPage(this, "change_pass");

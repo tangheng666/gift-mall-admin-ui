@@ -56,13 +56,13 @@
 <script>
 import {
   getRoleList,
-  getAllPermissionList,
   addRole,
   editRole,
   deleteRole,
   setDefaultRole,
   editRolePerm
-} from "@/api/index";
+} from "@/api/role";
+import { getAllPermissionList } from '@/api/permission';
 import util from "@/libs/util.js";
 import circleLoading from "../../my-components/circle-loading.vue";
 export default {

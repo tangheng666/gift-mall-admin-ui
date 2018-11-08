@@ -3,13 +3,17 @@ import { getMenuList } from '@/api/index';
 import lazyLoading from './lazyLoading.js';
 import router from '@/router/index';
 import Cookies from "js-cookie";
+import menu from '../fixed/menu.js';
 
 let util = {
 
 };
+util.projectName = function () {
+  return "礼品商城后台管理系统";
+}
 
 util.title = function (title) {
-    title = title || 'X-Boot 前后端分离开发平台';
+    title = title || util.projectName();
     window.document.title = title;
 };
 
@@ -254,8 +258,8 @@ util.initRouter = function (vm) {
     let userId = JSON.parse(Cookies.get("userInfo")).id;
     let accessToken = window.localStorage.getItem('accessToken')
     // 加载菜单
-    axios.get(getMenuList + userId, {headers: {'accessToken': accessToken}}).then(res => {
-        let menuData = res.result;
+    // axios.get(getMenuList + userId, {headers: {'accessToken': accessToken}}).then(res => {
+        let menuData = menu.getMenuList();
         if (menuData === null || menuData === "" || menuData === undefined) {
             return;
         }
@@ -277,7 +281,7 @@ util.initRouter = function (vm) {
             }
         });
         vm.$store.commit('setTagsList', tagsList);
-    });
+    // });
 };
 
 // 生成路由节点
@@ -295,7 +299,7 @@ util.initRouterNode = function (routers, data) {
         let meta = {};
         // 给页面添加权限、标题、第三方网页链接
         meta.permTypes = menu.permTypes ? menu.permTypes : null;
-        meta.title = menu.title ? menu.title + " - X-Boot前后端分离开发平台 By: Exrick" : null;
+        meta.title = menu.title ? menu.title + " - " + util.projectName() : null;
         meta.url = menu.url ? menu.url : null;
         menu.meta = meta;
 
@@ -303,4 +307,52 @@ util.initRouterNode = function (routers, data) {
     }
 };
 
+util.param2Obj = function (url) {
+  const search = url.split('?')[1]
+  if (!search) {
+    return {}
+  }
+  return JSON.parse(
+    '{"' +
+    decodeURIComponent(search)
+      .replace(/"/g, '\\"')
+      .replace(/&/g, '","')
+      .replace(/=/g, '":"') +
+    '"}'
+  )
+}
+util.cleanArray = function(actual) {
+  const newArray = []
+  for (let i = 0; i < actual.length; i++) {
+    if (actual[i]) {
+      newArray.push(actual[i])
+    }
+  }
+  return newArray
+}
+
+util.param = function(json) {
+  if (!json) return ''
+  return util.cleanArray(
+    Object.keys(json).map(key => {
+      if (json[key] === undefined) return ''
+      return encodeURIComponent(key) + '=' + encodeURIComponent(json[key])
+    })
+  ).join('&')
+}
+
+util.getQueryObject = function(url) {
+  url = url == null ? window.location.href : url
+  const search = url.substring(url.lastIndexOf('?') + 1)
+  const obj = {}
+  const reg = /([^?&=]+)=([^?&=]*)/g
+  search.replace(reg, (rs, $1, $2) => {
+    const name = decodeURIComponent($1)
+    let val = decodeURIComponent($2)
+    val = String(val)
+    obj[name] = val
+    return rs
+  })
+  return obj
+}
 export default util;

@@ -1,5 +1,11 @@
 // 统一请求路径前缀在libs/axios.js中修改
-import { getRequest, postRequest, putRequest, deleteRequest, uploadFileRequest } from '@/libs/axios';
+import {
+    getRequest,
+    postRequest,
+    putRequest,
+    deleteRequest,
+    uploadFileRequest
+} from '@/libs/axios';
 
 
 
@@ -10,36 +16,27 @@ export const drawCodeImage = "/xboot/common/captcha/draw/"
 // 获取菜单
 export const getMenuList = "/xboot/permission/getMenuList/"
 
-
-
 // 登陆
 export const login = (params) => {
-    return postRequest('/login', params)
+    return postRequest('/loginBack', params)
 }
 // 获取用户登录信息
 export const userInfo = (params) => {
     return getRequest('/user/info', params)
 }
-// 注册
-export const regist = (params) => {
-    return postRequest('/user/regist', params)
-}
 // 初始化验证码
 export const initCaptcha = (params) => {
     return getRequest('/common/captcha/init', params)
 }
-// 发送短信验证码
-export const sendSms = (mobile, params) => {
-    return getRequest(`/common/captcha/sendSms/${mobile}`, params)
-}
+
 // 短信验证码登录
 export const smsLogin = (params) => {
     return postRequest('/user/smsLogin', params)
 }
 // IP天气信息
-export const ipInfo = (params) => {
-    return getRequest('/common/ip/info', params)
-}
+// export const ipInfo = (params) => {
+//     return getRequest('/common/ip/info', params)
+// }
 // 个人中心编辑
 export const userInfoEdit = (params) => {
     return postRequest('/user/edit', params)
@@ -54,30 +51,6 @@ export const unlock = (params) => {
 }
 
 
-
-// github登录
-export const githubLogin = (params) => {
-    return getRequest('/social/github/login', params)
-}
-// qq登录
-export const qqLogin = (params) => {
-    return getRequest('/social/qq/login', params)
-}
-// 微博登录
-export const weiboLogin = (params) => {
-    return getRequest('/social/weibo/login', params)
-}
-// 绑定账号
-export const relate = (params) => {
-    return postRequest('/social/relate', params)
-}
-// 获取JWT
-export const getJWT = (params) => {
-    return getRequest('/social/getJWT', params)
-}
-
-
-
 // 获取绑定账号信息
 export const relatedInfo = (username, params) => {
     return getRequest(`/relate/getRelatedInfo/${username}`, params)
@@ -89,37 +62,6 @@ export const unRelate = (params) => {
 // 分页获取绑定账号信息
 export const getRelatedListData = (params) => {
     return getRequest('/relate/findByCondition', params)
-}
-
-
-
-// 获取用户数据 多条件
-export const getUserListData = (params) => {
-    return getRequest('/user/getByCondition', params)
-}
-// 获取全部用户数据
-export const getAllUserData = (params) => {
-    return getRequest('/user/getAll', params)
-}
-// 添加用户
-export const addUser = (params) => {
-    return postRequest('/user/admin/add', params)
-}
-// 编辑用户
-export const editUser = (params) => {
-    return postRequest('/user/admin/edit', params)
-}
-// 启用用户
-export const enableUser = (id, params) => {
-    return postRequest(`/user/admin/enable/${id}`, params)
-}
-// 禁用用户
-export const disableUser = (id, params) => {
-    return postRequest(`/user/admin/disable/${id}`, params)
-}
-// 删除用户
-export const deleteUser = (ids, params) => {
-    return deleteRequest(`/user/delByIds/${ids}`, params)
 }
 
 
@@ -148,62 +90,6 @@ export const deleteDepartment = (ids, params) => {
 export const searchDepartment = (params) => {
     return getRequest('/department/search', params)
 }
-
-
-
-// 获取全部角色数据
-export const getAllRoleList = (params) => {
-    return getRequest('/role/getAllList', params)
-}
-// 分页获取角色数据
-export const getRoleList = (params) => {
-    return getRequest('/role/getAllByPage', params)
-}
-// 添加角色
-export const addRole = (params) => {
-    return postRequest('/role/save', params)
-}
-// 编辑角色
-export const editRole = (params) => {
-    return postRequest('/role/edit', params)
-}
-// 设为或取消注册角色
-export const setDefaultRole = (params) => {
-    return postRequest('/role/setDefault', params)
-}
-// 分配角色权限
-export const editRolePerm = (id, params) => {
-    return postRequest(`/role/editRolePerm/${id}`, params)
-}
-// 删除角色
-export const deleteRole = (ids, params) => {
-    return deleteRequest(`/role/delAllByIds/${ids}`, params)
-}
-
-
-
-// 获取全部权限数据
-export const getAllPermissionList = (params) => {
-    return getRequest('/permission/getAllList', params)
-}
-// 添加权限
-export const addPermission = (params) => {
-    return postRequest('/permission/add', params)
-}
-// 编辑权限
-export const editPermission = (params) => {
-    return postRequest('/permission/edit', params)
-}
-// 删除权限
-export const deletePermission = (ids, params) => {
-    return deleteRequest(`/permission/delByIds/${ids}`, params)
-}
-// 搜索权限
-export const searchPermission = (params) => {
-    return getRequest('/permission/search', params)
-}
-
-
 // 分页获取日志数据
 export const getLogListData = (params) => {
     return getRequest('/log/getAllByPage', params)
