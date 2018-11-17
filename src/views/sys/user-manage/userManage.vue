@@ -93,7 +93,7 @@ u {
             <!-- <Table :columns="exportColumns" :data="exportData" ref="exportTable" style="display:none"></Table> -->
           </Row>
           <Row type="flex" justify="end" class="page">
-            <Page :current="searchForm.pageNumber" :total="total" :page-size="searchForm.pageSize" @on-change="changePage" @on-page-size-change="changePageSize" :page-size-opts="[10,20,50]" size="small" show-elevator show-sizer></Page>
+            <Page :current="searchForm.current" :total="total" :page-size="searchForm.limit" @on-change="changePage" @on-page-size-change="changePageSize" :page-size-opts="[10,20,50]" size="small" show-elevator show-sizer></Page>
           </Row>
         </Card>
       </i-col>
@@ -165,7 +165,7 @@ u {
             <p>您确认要导出全部 {{total}} 条数据？</p>
         </Modal> -->
 
-    <Modal title="用户加款" v-model="addMoneyModel" :mask-closable='false' :width="500" :styles="{top: '30px'}" class-name="vertical-center-modal">
+    <Modal title="用户加款" v-model="addMoneyModel" :mask-closable='false' :width="500">
       <Form ref="userAddMoneyFrom" :model="userAddMoneyFrom" :label-width="70" :rules="addMoneyFormValidate">
         <FormItem label="用户名" prop="username">
           <u>{{userAddMoneyFrom.mobile }}</u>
@@ -237,7 +237,7 @@ export default {
       selectDep: [],
       searchKey: '',
       searchForm: {
-        offset: 1,
+        current: 1,
         limit: 10,
         sort: '',
         order: 'desc',
@@ -285,18 +285,18 @@ export default {
           align: 'center',
           fixed: 'left'
         },
-        {
-          type: 'expand',
-          width: 50,
-          fixed: 'left',
-          render: (h, params) => {
-            return h(expandRow, {
-              props: {
-                row: params.row
-              }
-            })
-          }
-        },
+        // {
+        //   type: 'expand',
+        //   width: 50,
+        //   fixed: 'left',
+        //   render: (h, params) => {
+        //     return h(expandRow, {
+        //       props: {
+        //         row: params.row
+        //       }
+        //     })
+        //   }
+        // },
         {
           type: 'index',
           width: 60,
@@ -304,17 +304,22 @@ export default {
           fixed: 'left'
         },
         {
+          title: '用户编号',
+          key: 'id',
+          width: 145,
+          align: 'center'
+        },
+        {
           title: '用户账号',
           key: 'mobile',
           width: 145,
-          sortable: true,
-          fixed: 'left'
+          align: 'center'
         },
-
         {
           title: 'QQ号码',
           key: 'qq',
           width: 180,
+          align: 'center',
           sortable: true
         },
         {
@@ -333,10 +338,8 @@ export default {
           }
         },
         {
-          title: '创建时间',
-          key: 'createTime',
-          sortable: true,
-          sortType: 'desc',
+          title: '注册时间',
+          key: 'dateCreated',
           width: 150
         },
         {
@@ -433,20 +436,20 @@ export default {
     },
 
     changePage(v) {
-      this.searchForm.pageNumber = v
+      this.searchForm.current = v
       this.getUserList()
       this.clearSelectAll()
     },
     changePageSize(v) {
-      this.searchForm.pageSize = v
+      this.searchForm.limit = v
       this.getUserList()
     },
-    selectDateRange(v) {
-      if (v) {
-        this.searchForm.startDate = v[0]
-        this.searchForm.endDate = v[1]
-      }
-    },
+    // selectDateRange(v) {
+    //   if (v) {
+    //     this.searchForm.startDate = v[0]
+    //     this.searchForm.endDate = v[1]
+    //   }
+    // },
     getUserList() {
       // 多条件搜索用户列表
       this.loading = true
@@ -454,21 +457,18 @@ export default {
         this.loading = false
         if (res.returnCode === '0000') {
           this.data = res.data
-          if (!res.next) {
-            this.total = res.data.length
-          }
-          this.total = res.data.length + 1
+          this.total = res.total
         }
       })
     },
     handleSearch() {
-      this.searchForm.offset = 1
+      this.searchForm.current = 1
       this.searchForm.limit = 10
       this.getUserList()
     },
     handleReset() {
       this.$refs.searchForm.resetFields()
-      this.searchForm.offset = 1
+      this.searchForm.current = 1
       this.searchForm.limit = 10
       this.selectDep = []
       // 重新加载数据

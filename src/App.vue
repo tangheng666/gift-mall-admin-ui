@@ -1,18 +1,27 @@
 <template>
-    <div id="main" class="app-main">
-        <router-view></router-view>
-    </div>
+  <div id="main" class="app-main">
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
 export default {
   data() {
-    return {};
+    return {}
+  },
+  computed: {
+    key() {
+      return this.$route.fullPath
+
+      // return this.$route.name !== undefined
+      //   ? this.$route.name + +new Date()
+      //   : this.$route + +new Date()
+    }
   },
   mounted() {},
   beforeDestroy() {},
   methods: {}
-};
+}
 </script>
 
 <style>

@@ -62,58 +62,11 @@ u {
             <Table :loading="loading" border :columns="columns" :data="data" sortable="custom" @on-selection-change="showSelect" ref="table"></Table>
           </Row>
           <Row type="flex" justify="end" class="page">
-            <Page :current="searchForm.pageNumber" :total="total" :page-size="searchForm.pageSize" @on-change="changePage" @on-page-size-change="changePageSize" :page-size-opts="[10,20,50]" size="small" show-elevator show-sizer></Page>
+            <Page :current="searchForm.current" :total="total" :page-size="searchForm.limit" @on-change="changePage" @on-page-size-change="changePageSize" :page-size-opts="[10,20,50]" size="small" show-elevator show-sizer></Page>
           </Row>
         </Card>
       </i-col>
     </Row>
-    <!-- <Modal :title="modalTitle" v-model="giftModelVisible" :mask-closable='false' :width="600" :styles="{top: '30px'}">
-      <Form ref="giftForm" :model="giftForm" :label-width="100" :rules="giftFormValidate">
-        <FormItem label="外部礼品编号" prop="goodNo">
-          <Input v-model="giftForm.goodNo" autocomplete="off" />
-        </FormItem>
-        <FormItem label="净重（kg）" prop="weight">
-          <Input v-model="giftForm.weight" />
-        </FormItem>
-        <FormItem label="单价" prop="price">
-          <Input v-model="giftForm.price" />
-        </FormItem>
-        <FormItem label="库存" prop="stock">
-          <Input v-model="giftForm.stock" />
-        </FormItem>
-
-        <FormItem label="规格" prop="standard">
-          <Input v-model="giftForm.standard" />
-        </FormItem>
-
-        <Form-item label="照片" prop="photo">
-          <Poptip trigger="hover" title="图片预览" placement="right" width="350">
-            <Input v-model="giftForm.photo" placeholder="可直接填入网络图片链接" clearable />
-            <div slot="content">
-              <img :src="giftForm.photo" alt="无效的图片链接" style="width: 100%;margin: 0 auto;display: block;">
-              <a @click="viewPic()" style="margin-top:5px;text-align:right;display:block">查看原图</a>
-            </div>
-          </Poptip>
-          <Upload :action="uploadFileUrl" :on-success="handleSuccess" :on-error="handleError" :format="['jpg','jpeg','png','gif']" :max-size="5120" :on-format-error="handleFormatError" :on-exceeded-size="handleMaxSize" :before-upload="beforeUpload" ref="up" class="upload">
-            <Button icon="ios-cloud-upload-outline">上传图片</Button>
-          </Upload>
-        </Form-item>
-        <FormItem label="礼品简介" prop="summary">
-          <Input v-model="giftForm.summary" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请填写礼品简介" />
-        </FormItem>
-
-      </Form>
-      <div slot="footer">
-        <Button type="text" @click="cancelGift">取消</Button>
-        <Button type="primary" :loading="submitLoading" @click="submitGift">提交</Button>
-      </div>
-    </Modal>
-    <Modal title="图片预览" v-model="viewImage" :styles="{top: '30px'}" draggable>
-      <img :src="giftForm.photo" alt="无效的图片链接" style="width: 100%;margin: 0 auto;display: block;">
-      <div slot="footer">
-        <Button @click="viewImage=false">关闭</Button>
-      </div>
-    </Modal> -->
   </div>
 </template>
 
@@ -138,7 +91,7 @@ export default {
       selectDep: [],
       searchKey: '',
       searchForm: {
-        offset: 1,
+        current: 1,
         limit: 10,
         status: '',
         search: ''
@@ -159,13 +112,11 @@ export default {
         {
           type: 'selection',
           width: 60,
-          align: 'center',
-          fixed: 'left'
+          align: 'center'
         },
         {
           type: 'expand',
           width: 50,
-          fixed: 'left',
           render: (h, params) => {
             return h(expandRow, {
               props: {
@@ -177,8 +128,7 @@ export default {
         {
           type: 'index',
           width: 60,
-          align: 'center',
-          fixed: 'left'
+          align: 'center'
         },
         {
           title: '编号',
@@ -333,14 +283,14 @@ export default {
       })
     },
     handleSearch() {
-      this.searchForm.offset = 1
+      this.searchForm.current = 1
       this.searchForm.limit = 10
       this.getAdditionList()
       this.clearSelectAll()
     },
     handleReset() {
       this.$refs.searchForm.resetFields()
-      this.searchForm.offset = 1
+      this.searchForm.current = 1
       this.searchForm.limit = 10
       this.selectDep = []
       // 重新加载数据
@@ -426,7 +376,9 @@ export default {
               props: {
                 value: this.dealForm.reason,
                 autofocus: true,
-                placeholder: '请输入处理原因'
+                placeholder: '请输入处理原因',
+                type: 'textarea',
+                autosize: 'true'
               },
               on: {
                 input: val => {
@@ -449,6 +401,8 @@ export default {
           dealAddition(this.dealForm).then(res => {
             if (res.returnCode === '0000') {
               this.$Message.success('操作成功 !')
+              this.dealForm.reason = ''
+              this.dealForm.allow = ''
               this.getAdditionList()
             } else {
               this.$Message.info(res.returnMessage)

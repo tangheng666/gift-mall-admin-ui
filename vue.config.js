@@ -1,6 +1,6 @@
 module.exports = {
     devServer: {
-        host: '192.168.1.190',
+        // host: '192.168.0.149',
         port: 9999,
         proxy: {
             '/rs': {

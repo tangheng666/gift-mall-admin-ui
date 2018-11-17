@@ -67,9 +67,9 @@
                               <a @click="showChangeEmail">修改邮箱</a>
                           </div>
                       </FormItem>
-                      <FormItem label="地址：" >
+                      <!-- <FormItem label="地址：" >
                           <al-cascader v-model="userForm.addressArray" @on-change="changeAddress" data-type="code" level="2" style="width:250px"/>
-                      </FormItem>
+                      </FormItem> -->
                       <FormItem label="所属部门：">
                           <span>{{ userForm.departmentTitle }}</span>
                       </FormItem>
@@ -250,7 +250,7 @@ export default {
       this.defaultList[0].url = userInfo.avatar;
       if (userInfo.address !== null && userInfo.address !== "") {
         this.userForm.address = userInfo.address;
-        this.userForm.addressArray = JSON.parse(userInfo.address);
+        // this.userForm.addressArray = JSON.parse(userInfo.address);
       }
       if (this.userForm.type === 0) {
         this.userForm.typeTxt = "普通用户";

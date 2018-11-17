@@ -2,7 +2,7 @@
   <Row type="flex" justify="center" align="middle" class="login" @keydown.enter.native="submitLogin">
     <i-col :xs="{span:22}" style="width: 368px;">
       <Row class="header">
-        <img src="../assets/xboot.png" width="220px" />
+        <img src="../assets/xiaoji.png" width="220px" />
         <div class="description">欢迎使用----{{descTitle}}</div>
       </Row>
 

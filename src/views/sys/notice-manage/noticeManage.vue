@@ -63,7 +63,7 @@ u {
             <Table :loading="loading" border :columns="columns" :data="data" sortable="custom" @on-sort-change="changeSort" @on-selection-change="showSelect" ref="table"></Table>
           </Row>
           <Row type="flex" justify="end" class="page">
-            <Page :current="searchForm.offset" :total="total" :page-size="searchForm.limit" @on-change="changePage" @on-page-size-change="changelimit" :page-size-opts="[10,20,50]" size="small" show-elevator show-sizer></Page>
+            <Page :total="total" :current="searchForm.current" :page-size="searchForm.limit" @on-change="changePage" @on-page-size-change="changelimit" :page-size-opts="[10,20,50]" size="small" show-total show-elevator show-sizer></Page>
           </Row>
         </Card>
       </i-col>
@@ -123,7 +123,7 @@ export default {
       selectList: [],
       searchKey: '',
       searchForm: {
-        offset: 1,
+        current: 1,
         limit: 10,
         createDate: '',
         title: ''
@@ -235,7 +235,7 @@ export default {
       this.getNoticeList()
     },
     changePage(v) {
-      this.searchForm.offset = v
+      this.searchForm.current = v
       this.getNoticeList()
       this.clearSelectAll()
     },
@@ -254,26 +254,18 @@ export default {
         this.loading = false
         if (res.returnCode === '0000') {
           this.data = res.data
-          if (!res.next) {
-            this.total = res.data.length
-            
-          console.log(this.total);
-          } else {
-            
-          console.log(this.total + "   2");
-            this.total = res.data.length + 1
-          }
+          this.total = res.total
         }
       })
     },
     handleSearch() {
-      this.searchForm.offset = 1
+      this.searchForm.current = 1
       this.searchForm.limit = 10
       this.getNoticeList()
     },
     handleReset() {
       this.$refs.searchForm.resetFields()
-      this.searchForm.offset = 1
+      this.searchForm.current = 1
       this.searchForm.limit = 10
       this.selectDate = null
       // 重新加载数据

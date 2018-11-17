@@ -81,13 +81,14 @@ export const getRequest = (url, params) => {
 
 export const postRequest = (url, params) => {
     let accessToken = getStore("accessToken");
-    if (params.offset && !isNaN(params.offset)) {
-        params.offset = params.offset - 1;
+    if (params.current && !isNaN(params.current)) {
+        params.offset = (params.current - 1) * params.limit
+        delete params.current
     }
     let basea = base;
     if (!url.indexOf("upload") != -1) {
         basea = base + "/admin"
-    } 
+    }
     return axios({
         method: 'post',
         url: `${basea}${url}`,

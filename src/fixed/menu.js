@@ -24,9 +24,33 @@ menu.getMenuList = function () {
           "icon": "ios-bowtie",
           "children": null,
           "permTypes": ["add", "edit", "delete"],
-          "expand": true,
-          "checked": false,
-          "selected": false
+        },
+        {
+          "name": "master-order-manage",
+          "title": "主订单管理",
+          "path": "master-order-manage",
+          "component": "sys/master-order-manage/masterOrderManage",
+          "icon": "md-film",
+          "children": null,
+          "permTypes": ["add"]
+        },
+        {
+          "name": "salve-order-manage",
+          "title": "子订单管理",
+          "path": "salve-order-manage",
+          "component": "sys/salve-order-manage/salveOrderManage",
+          "icon": "ios-clipboard",
+          "children": null,
+          "permTypes": ["add"]
+        },
+        {
+          "name": "user-apply-replenish",
+          "title": "申请补发管理",
+          "path": "user-apply-replenish",
+          "component": "sys/user-apply-replenish/userApplyReplenish",
+          "icon": "md-bus",
+          "children": null,
+          "permTypes": ["add"]
         },
         {
           "name": "notice-manage",

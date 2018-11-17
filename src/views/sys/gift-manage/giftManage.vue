@@ -57,7 +57,7 @@ u {
             <Table :loading="loading" border :columns="columns" :data="data" sortable="custom" @on-selection-change="showSelect" ref="table"></Table>
           </Row>
           <Row type="flex" justify="end" class="page">
-            <Page :current="searchForm.offset" :page-size="searchForm.limit" :total="total" @on-change="changePage" @on-page-size-change="changePageSize" :page-size-opts="[10,20,50]" size="small" show-elevator show-sizer></Page>
+            <Page :current="searchForm.current" :page-size="searchForm.limit" :total="total" @on-change="changePage" @on-page-size-change="changePageSize" :page-size-opts="[10,20,50]" size="small" show-elevator show-sizer></Page>
           </Row>
         </Card>
       </i-col>
@@ -135,7 +135,7 @@ export default {
       selectDep: [],
       searchKey: '',
       searchForm: {
-        offset: 1,
+        current: 1,
         limit: 10,
         search: ''
       },
@@ -269,7 +269,7 @@ export default {
     },
 
     changePage(v) {
-      this.searchForm.offset = v
+      this.searchForm.current = v
       this.getGiftList()
       this.clearSelectAll()
     },
@@ -285,7 +285,6 @@ export default {
         this.loading = false
         if (res.returnCode === '0000') {
           this.data = res.data
-          console.log("是否有下一页：" + res.next )
           if (res.next) {
             this.total = res.data.length + 1
           } else {
@@ -295,13 +294,13 @@ export default {
       })
     },
     handleSearch() {
-      this.searchForm.offset = 1
+      this.searchForm.current = 1
       this.searchForm.limit = 10
       this.getGiftList()
     },
     handleReset() {
       this.$refs.searchForm.resetFields()
-      this.searchForm.offset = 1
+      this.searchForm.current = 1
       this.searchForm.limit = 10
       this.selectDep = []
       // 重新加载数据
