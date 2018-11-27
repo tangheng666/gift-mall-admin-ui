@@ -75,7 +75,7 @@ u {
 </template>
 
 <script>
-import { getUserApplyReplacement } from '@/api/userApplyReplenish'
+import { getUserApplyReplacement, checkout } from '@/api/userApplyReplenish'
 import expandRow from './expand.vue'
 import circleLoading from '../../my-components/circle-loading.vue'
 
@@ -131,7 +131,7 @@ export default {
           align: 'center',
           fixed: 'left'
         },
-            {
+        {
           title: '补发编号',
           key: 'id',
           width: 100
@@ -210,7 +210,7 @@ export default {
                     },
                     on: {
                       click: () => {
-                        this.preview(params.row)
+                        this.review(params.row)
                       }
                     }
                   },
@@ -222,7 +222,12 @@ export default {
         }
       ],
       data: [],
-      total: 0
+      total: 0,
+      reviewForm: {
+        rid: '',
+        reason: '',
+        status: ''
+      }
     }
   },
   mounted() {
@@ -255,7 +260,7 @@ export default {
       this.getUserApplyRelanishList()
     },
     getUserApplyRelanishList() {
-      this.loading = true 
+      this.loading = true
       getUserApplyReplacement(this.searchForm).then(res => {
         this.loading = false
         if (res.returnCode === '0000') {
@@ -293,6 +298,96 @@ export default {
     },
     clearSelectAll() {
       this.$refs.table.selectAll(false)
+    },
+    review(row) {
+      this.reviewForm.rid = v.id
+      this.$Modal.confirm({
+        render: h => {
+          return [
+            h(
+              'RadioGroup',
+              {
+                props: {
+                  value: this.reviewForm.status
+                },
+                attrs: {
+                  style: 'margin-top:20px; margin-bottom:20px;'
+                },
+                on: {
+                  'on-change': status => {
+                    this.reviewForm.status = status
+                  }
+                }
+              },
+              [
+                h(
+                  'Radio',
+                  {
+                    props: {
+                      label: 'PASS'
+                    }
+                  },
+                  [
+                    h('Icon', { props: { type: 'md-checkmark' } }),
+                    h('span', '通过审核')
+                  ]
+                ),
+                h(
+                  'Radio',
+                  {
+                    props: {
+                      label: 'REJECT'
+                    }
+                  },
+                  [
+                    h('Icon', { props: { type: 'md-close' } }),
+                    h('span', '不通过审核')
+                  ]
+                )
+              ]
+            ),
+
+            h('Input', {
+              props: {
+                value: this.reviewForm.reason,
+                autofocus: true,
+                placeholder: '请输入处理原因',
+                type: 'textarea',
+                autosize: 'true'
+              },
+              on: {
+                input: val => {
+                  this.reviewForm.reason = val
+                }
+              }
+            })
+          ]
+        },
+
+        onOk: () => {
+          if (this.reviewForm.status.trim() === '') {
+            this.$Message.info('请选择处理结果 !')
+            return
+          }
+          if (this.reviewForm.reason.trim() === '') {
+            this.$Message.info('原因必填的 !')
+            return
+          }
+          checkout(this.reviewForm).then(res => {
+            if (res.returnCode === '0000') {
+              this.$Message.success('操作成功 !')
+              this.reviewForm.reason = ''
+              this.reviewForm.status = ''
+              this.getUserApplyRelanishList()
+            } else {
+              this.$Message.info(res.returnMessage)
+            }
+          })
+        },
+        onCancel: () => {
+          // this.$Message.info('Clicked cancel')
+        }
+      })
     }
   }
 }

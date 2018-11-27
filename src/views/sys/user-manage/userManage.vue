@@ -180,6 +180,18 @@ u {
         <Button type="primary" :loading="submitLoading" @click="submitAddMoney">提交</Button>
       </div>
     </Modal>
+
+    <Modal title="重置密码" v-model="restPwdModel" :mask-closable='false' :width="500">
+      <Form ref="userAddMoneyFrom" :model="userAddMoneyFrom" :label-width="70">
+        <FormItem label="新密码" prop="password">
+          <Input type="text" v-model="restPwdForm.password" style="width:200px;"/>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="text" @click="cancelRestPwd">取消</Button>
+        <Button type="primary" :loading="submitLoading" @click="submitRestPwd">提交</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -192,7 +204,8 @@ import {
   disableUser,
   deleteUser,
   getAllUserData,
-  charge
+  charge,
+  restPwd
 } from '@/api/user'
 import { getAllRoleList } from '@/api/role'
 import { uploadFile } from '@/api/index'
@@ -368,11 +381,28 @@ export default {
                 },
                 '加款'
               ),
+              // h(
+              //   'Button',
+              //   {
+              //     props: {
+              //       type: 'primary',
+              //       size: 'small'
+              //     },
+              //     style: {
+              //       marginRight: '5px'
+              //     },
+              //     on: {
+              //       click: () => {
+              //         this.edit(params.row)
+              //       }
+              //     }
+              //   },
+              //   '编辑'
+              // ),
               h(
                 'Button',
                 {
                   props: {
-                    type: 'primary',
                     size: 'small'
                   },
                   style: {
@@ -380,51 +410,39 @@ export default {
                   },
                   on: {
                     click: () => {
-                      this.edit(params.row)
+                      this.restPwd(params.row)
                     }
                   }
                 },
-                '编辑'
+                '重置密码'
               ),
-              h(
-                'Button',
-                {
-                  props: {
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px'
-                  },
-                  on: {
-                    click: () => {
-                      this.disable(params.row)
-                    }
-                  }
-                },
-                '禁用'
-              ),
-              h(
-                'Button',
-                {
-                  props: {
-                    type: 'error',
-                    size: 'small'
-                  },
-                  on: {
-                    click: () => {
-                      this.remove(params.row)
-                    }
-                  }
-                },
-                '删除'
-              )
+              // h(
+              //   'Button',
+              //   {
+              //     props: {
+              //       type: 'error',
+              //       size: 'small'
+              //     },
+              //     on: {
+              //       click: () => {
+              //         this.remove(params.row)
+              //       }
+              //     }
+              //   },
+              //   '删除'
+              // )
             ])
           }
         }
       ],
       data: [],
       total: 0,
-      addMoneyModel: false
+      addMoneyModel: false,
+      restPwdModel: false,
+      restPwdForm: {
+        usrid: '',
+        password: '888888'
+      }
     }
   },
   methods: {
@@ -507,23 +525,8 @@ export default {
           }
         })
       }
-      // } else if (name === "exportAll") {
-      //   this.modalExportAll = true;
-      // }
     },
-    // exportAll() {
-    //   getAllUserData().then(res => {
-    //     this.modalExportAll = false
-    //     if (res.success) {
-    //       this.exportData = res.result
-    //       setTimeout(() => {
-    //         this.$refs.exportTable.exportCsv({
-    //           filename: '用户全部数据'
-    //         })
-    //       }, 1000)
-    //     }
-    //   })
-    // },
+
     submitAddMoney() {
       this.$refs.userAddMoneyFrom.validate(valid => {
         if (valid) {
@@ -628,6 +631,29 @@ export default {
       this.modalTitle = '添加用户'
       this.$refs.userForm.resetFields()
       this.userModalVisible = true
+    },
+    restPwd(item) {
+      this.restPwdForm.usrid = item.id
+      this.restPwdModel = true
+    },
+    submitRestPwd() {
+      if (!this.restPwdForm.password) {
+        this.$Message.info('新密码不能为空')
+        return
+      }
+      restPwd(this.restPwdForm).then(res => {
+        if (res.returnCode === '0000') {
+          this.$Message.success('操作成功')
+          this.getUserList()
+          this.restPwdModel = false
+        } else {
+          this.$Message.info(res.returnMessage)
+        }
+      })
+    },
+    cancelRestPwd() {
+      this.restPwdForm.usrid = ''
+      this.restPwdModel = false
     },
     addMoney(v) {
       this.$refs.userAddMoneyFrom.resetFields()

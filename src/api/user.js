@@ -35,3 +35,8 @@ export const deleteUser = (ids, params) => {
 export const charge = (params) => {
   return postRequest('/charge', params)
 }
+
+// 重置密码
+export const restPwd = (params) => {
+  return postRequest('/resetPd', params)
+}

@@ -164,22 +164,22 @@ export default {
             const row = params.row
             const color =
               row.state === 'CREATED'
-                ? '#20a0ea'
+                ? '#a593ec'
                 : row.state === 'PAYED'
-                  ? '#19BE6B'
-                  : '#ed2842'
+                  ? '#00ff80'
+                  : '#db5224'
             const text =
               row.state === 'CREATED'
                 ? '待支付'
                 : row.state === 'PAYED'
-                  ? '已支付'
+                  ? '已支付待发货'
                   : '已取消'
 
             return h(
               'span',
               {
                 attrs: {
-                  style: 'color:' + color
+                  style: 'font-size:14px;color:' + color
                 }
               },
               text
@@ -238,9 +238,9 @@ export default {
   mounted() {
     this.init()
   },
-    watch: {
+  watch: {
     $route(to, from) {
-      if(to.path === '/sys/master-order-manage'){
+      if (to.path === '/sys/master-order-manage') {
         this.init()
       }
       // 对路由变化作出响应...
@@ -265,11 +265,6 @@ export default {
       this.searchForm.limit = v
       this.getMasterOrderList()
     },
-    // selectDateRange(v) {
-    //   if (v) {
-    //     this.searchForm.createDate = v
-    //   }
-    // },
     getMasterOrderList() {
       this.loading = true
       getMasterOrderList(this.searchForm).then(res => {
@@ -289,7 +284,8 @@ export default {
       this.$refs.searchForm.resetFields()
       this.searchForm.current = 1
       this.searchForm.limit = 10
-      this.selectDate = null
+      this.startTimeNoF = null
+      this.endTimeNoF = null
       // 重新加载数据
       this.getMasterOrderList()
     },

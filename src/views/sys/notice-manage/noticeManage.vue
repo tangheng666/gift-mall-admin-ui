@@ -79,6 +79,12 @@ u {
         <FormItem label="公告概要" prop="remark">
           <Input v-model="noticeForm.remark" type="textarea" :autosize="{minRows: 3,maxRows: 6}" placeholder="请填写公告概要" />
         </FormItem>
+        <FormItem label="是否置顶" prop="top">
+          <RadioGroup v-model="noticeForm.top">
+            <Radio label="true">是</Radio>
+            <Radio label="false">否</Radio>
+          </RadioGroup>
+        </FormItem>
       </Form>
       <div slot="footer">
         <Button type="text" @click="cancelNotice">取消</Button>
@@ -137,6 +143,7 @@ export default {
         content: '',
         remark: '',
         id: '',
+        top: 'false',
         dateCreated: ''
       },
       tinymceId:
@@ -170,6 +177,15 @@ export default {
           title: '内容',
           key: 'content',
           align: 'center'
+        },
+        {
+          title: '是否置顶',
+          key: 'top',
+          align: 'center',
+          width: 120,
+          render: (h, params) => {
+            return h('span', params.row.top ? '是' : '否')
+          }
         },
         {
           title: '创建时间',
@@ -339,6 +355,7 @@ export default {
       let str = JSON.stringify(v)
       let notice = JSON.parse(str)
       window.tinymce.get(this.tinymceId).setContent(notice.content)
+      notice.top = notice.top + ''
       this.noticeForm = notice
       this.noticeModalVisible = true
     },
@@ -346,6 +363,7 @@ export default {
     preview(v) {
       let str = JSON.stringify(v)
       let notice = JSON.parse(str)
+      notice.top = notice.top + ''
       this.noticeForm = notice
       this.noticeModalPreview = true
     },

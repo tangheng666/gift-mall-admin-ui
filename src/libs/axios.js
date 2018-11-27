@@ -81,7 +81,7 @@ export const getRequest = (url, params) => {
 
 export const postRequest = (url, params) => {
     let accessToken = getStore("accessToken");
-    if (params.current && !isNaN(params.current)) {
+    if (typeof (params) !== 'undefined' && params.current && !isNaN(params.current)) {
         params.offset = (params.current - 1) * params.limit
         delete params.current
     }
@@ -95,7 +95,11 @@ export const postRequest = (url, params) => {
         data: qs.stringify(params),
         transformRequest: [function (data) {
             if (accessToken && accessToken.trim() !== '') {
-                data += "&token=" + accessToken
+                if (typeof (params) !== 'undefined') {
+                    data += "&token=" + accessToken
+                } else {
+                    data = "&token=" + accessToken
+                }
             }
             return data;
         }],

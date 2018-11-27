@@ -82,7 +82,7 @@ u {
 </template>
 
 <script>
-import { getSalveOrderList } from '@/api/salveOrder'
+import { getSalveOrderList, orderRefund } from '@/api/salveOrder'
 import expandRow from './expand.vue'
 import circleLoading from '../../my-components/circle-loading.vue'
 
@@ -98,11 +98,13 @@ export default {
       operationLoading: false,
       drop: false,
       stateAll: [
+        { key: 'CREATED', value: '已创建' },
         { key: 'PAYED', value: '待发货' },
         { key: 'EXPRESSED', value: '已发货' },
         { key: 'REFUND', value: '待退款' },
         { key: 'REFUNDED', value: '已退款' },
-        { key: 'FINISHED', value: '已完成' }
+        { key: 'FINISHED', value: '已完成' },
+        { key: 'CANCELED', value: '已取消' }
       ],
       selectCount: 0,
       selectList: [],
@@ -171,27 +173,39 @@ export default {
           render: (h, params) => {
             const row = params.row
             const color =
-              row.state === 'PAYED'
-                ? '#20a0ea'
-                : row.state === 'EXPRESSED'
-                  ? '#19BE6B'
-                  : '#ed2842'
+              row.state === 'CREATED'
+                ? '#a593ec'
+                : row.state === 'PAYED'
+                  ? '#20a0ea'
+                  : row.state === 'EXPRESSED'
+                    ? '#e195ea'
+                    : row.state === 'REFUND'
+                      ? '#541768'
+                      : row.state === 'REFUNDED'
+                        ? '#dd2230'
+                        : row.state === 'CANCELED'
+                          ? '#db5224'
+                          : '#00ff80'
             const text =
-              row.state === 'PAYED'
-                ? '待发货'
-                : row.state === 'EXPRESSED'
-                  ? '已发货'
-                  : row.state === 'REFUND'
-                    ? '待退款'
-                    : row.state === 'REFUNDED'
-                      ? '已退款'
-                      : '已完成'
+              row.state === 'CREATED'
+                ? '已创建'
+                : row.state === 'PAYED'
+                  ? '待发货'
+                  : row.state === 'EXPRESSED'
+                    ? '已发货'
+                    : row.state === 'REFUND'
+                      ? '待退款'
+                      : row.state === 'REFUNDED'
+                        ? '已退款'
+                        : row.state === 'CANCELED'
+                          ? '已取消'
+                          : '已完成'
 
             return h(
               'span',
               {
                 attrs: {
-                  style: 'color:' + color
+                  style: 'font-size:14px;color:' + color
                 }
               },
               text
@@ -228,11 +242,11 @@ export default {
                   },
                   on: {
                     click: () => {
-                      this.preview(params.row)
+                      this.refund(params.row.id)
                     }
                   }
                 },
-                '嘿嘿'
+                '退款'
               )
             ])
           }
@@ -247,7 +261,7 @@ export default {
   },
   watch: {
     $route(to, from) {
-      if(to.path === '/sys/salve-order-manage'){
+      if (to.path === '/sys/salve-order-manage') {
         this.init()
       }
       // 对路由变化作出响应...
@@ -322,6 +336,21 @@ export default {
     },
     clearSelectAll() {
       this.$refs.table.selectAll(false)
+    },
+    refund(id) {
+      this.$Modal.confirm({
+        title: '订单退款',
+        content: '您确认该单要退款吗?',
+        onOk: () => {
+          orderRefund(id).then(res => {
+            if (res.success === true) {
+              this.$Message.success('操作成功')
+            } else {
+              this.$Message.info(res.returnMessage)
+            }
+          })
+        }
+      })
     }
   }
 }

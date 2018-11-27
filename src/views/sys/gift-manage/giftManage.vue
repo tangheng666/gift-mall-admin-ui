@@ -80,7 +80,9 @@ u {
         <FormItem label="规格" prop="standard">
           <Input v-model="giftForm.standard" />
         </FormItem>
-
+        <FormItem label="禁发地区" prop="noArea">
+          <Input v-model="giftForm.noArea" />
+        </FormItem>
         <Form-item label="照片" prop="photo">
           <Poptip trigger="hover" title="图片预览" placement="right" width="350">
             <Input v-model="giftForm.photo" placeholder="可直接填入网络图片链接" clearable />
@@ -89,8 +91,7 @@ u {
               <a @click="viewPic()" style="margin-top:5px;text-align:right;display:block">查看原图</a>
             </div>
           </Poptip>
-          <Upload :action="uploadFileUrl" :on-success="handleSuccess" :show-upload-list="false" name="fstream" :on-error="handleError" :format="['jpg','jpeg','png','gif']" :max-size="5120" 
-          :on-format-error="handleFormatError" :on-exceeded-size="handleMaxSize" :before-upload="beforeUpload" ref="up" class="upload">
+          <Upload :action="uploadFileUrl" :on-success="handleSuccess" :show-upload-list="false" name="fstream" :on-error="handleError" :format="['jpg','jpeg','png','gif']" :max-size="5120" :on-format-error="handleFormatError" :on-exceeded-size="handleMaxSize" :before-upload="beforeUpload" ref="up" class="upload">
             <Button icon="ios-cloud-upload-outline">上传图片</Button>
           </Upload>
         </Form-item>
@@ -149,6 +150,7 @@ export default {
         stock: 0,
         summary: '',
         weight: 0.0,
+        noArea:'',
         goodNo: '',
         id: '',
         photo: 'https://s1.ax1x.com/2018/05/19/CcdVQP.png'
@@ -169,11 +171,16 @@ export default {
           fixed: 'left'
         },
         {
-          title: '外部礼品编号',
-          key: 'goodNo',
-          width: 200
+          title: '礼品编号',
+          key: 'id',
+          width: 100
         },
 
+        {
+          title: '外部礼品编号',
+          key: 'goodNo',
+          width: 120
+        },
         {
           title: '礼品简介',
           key: 'summary',
@@ -199,6 +206,11 @@ export default {
         {
           title: '库存',
           key: 'stock',
+          width: 150
+        },
+        {
+          title: '禁发地区',
+          key: 'noArea',
           width: 150
         },
         {
@@ -288,7 +300,7 @@ export default {
           if (res.next) {
             this.total = res.data.length + 1
           } else {
-            this.total = res.data.length-1
+            this.total = res.data.length - 1
           }
         }
       })
@@ -365,7 +377,6 @@ export default {
       })
     },
     beforeUpload() {
-      
       return true
     },
     handleSuccess(res, file) {
@@ -409,9 +420,11 @@ export default {
           this.operationLoading = true
           deleteGift({ id: v.id }).then(res => {
             this.operationLoading = false
-            if (res.success === true) {
+            if (res.returnCode === '0000') {
               this.$Message.success('删除成功')
               this.getGiftList()
+            } else {
+              this.$Message.success(res.returnMessage)
             }
           })
         }

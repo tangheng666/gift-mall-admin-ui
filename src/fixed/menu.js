@@ -39,7 +39,7 @@ menu.getMenuList = function () {
           "title": "子订单管理",
           "path": "salve-order-manage",
           "component": "sys/salve-order-manage/salveOrderManage",
-          "icon": "ios-clipboard",
+          "icon": "ios-paper",
           "children": null,
           "permTypes": ["add"]
         },
@@ -51,6 +51,15 @@ menu.getMenuList = function () {
           "icon": "md-bus",
           "children": null,
           "permTypes": ["add"]
+        },
+        {
+          "name": "express-fee",
+          "title": "修改物流价格",
+          "path": "express-fee",
+          "component": "sys/express-fee/expressFee",
+          "icon": "md-ionitron",
+          "children": null,
+          "permTypes": ["edit"]
         },
         {
           "name": "notice-manage",
